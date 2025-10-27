@@ -1,0 +1,12 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Allow access to CSS, JS, and image files
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Redirect all requests to index.php
+RewriteRule ^(.*)$ /index.php?route=$1 [QSA,L]
+
+# Set default charset
+AddDefaultCharset UTF-8

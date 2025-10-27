@@ -1,0 +1,64 @@
+{% extends "layout.twig" %}
+
+{% block title %}Dashboard - Ticket Management{% endblock %}
+
+{% block styles %}
+<link rel="stylesheet" href="/css/dashboard.css">
+{% endblock %}
+
+{% block content %}
+<section class="dashboard-container">
+    <!-- Decorative Circles -->
+    <div class="circle circle-a"></div>
+    <div class="circle circle-b"></div>
+
+    <!-- Header Section -->
+    <header class="dashboard-header">
+        <h1 class="dashboard-title">Dashboard</h1>
+        <p>Manage and track your tickets efficiently</p>
+        <p id="feedback" class="feedback-text" style="display: none;"></p>
+    </header>
+
+    <!-- Tickets Section -->
+    <section class="tickets-section">
+        <h2>Manage Tickets</h2>
+
+        <div class="tickets-content">
+            <!-- Ticket Form (Left Side) -->
+            <div class="ticket-form-container">
+                <form class="ticket-form" id="ticketForm">
+                    <input
+                        type="text"
+                        id="title"
+                        placeholder="Ticket title"
+                        required
+                    />
+
+                    <textarea
+                        id="description"
+                        placeholder="Ticket description"
+                        required
+                    ></textarea>
+
+                    <select id="status">
+                        <option value="open">Open</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="closed">Closed</option>
+                    </select>
+
+                    <button type="submit">Add Ticket</button>
+                </form>
+            </div>
+
+            <!-- Ticket List (Right Side) -->
+            <div class="ticket-list" id="ticketList">
+                <p class="empty-text">No tickets yet. Add one to get started!</p>
+            </div>
+        </div>
+    </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/js/app.js"></script>
+{% endblock %}
