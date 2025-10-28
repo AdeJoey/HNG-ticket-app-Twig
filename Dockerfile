@@ -38,4 +38,15 @@ RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/Allo
 EXPOSE 80
 
 # Start Apache
+Index of /
+[ICO]	Name	Last modified	Size	Description
+[   ]	Dockerfile	2025-10-28 18:15	1.2K	 
+[TXT]	README.md	2025-10-28 18:15	897	 
+[   ]	composer.json	2025-10-28 18:15	214	 
+[   ]	composer.lock	2025-10-28 18:15	11K	 
+[DIR]	data/	2025-10-28 18:15	-	 
+[DIR]	public/	2025-10-28 18:15	-	 
+[DIR]	src/	2025-10-28 18:15	-	 
+[DIR]	vendor/	2025-10-28 18:15	-	 
+Apache/2.4.65 (Debian) Server at hng-ticket-app-twig-233e.onrender.com Port 80
 CMD ["apache2-foreground"]
