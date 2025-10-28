@@ -4,10 +4,12 @@ session_start();
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use App\Auth;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
 
 // Initialize Twig
-$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../src/views');
-$twig = new \Twig\Environment($loader, [
+$loader = new FilesystemLoader(__DIR__ . '/../src/views');
+$twig = new Environment($loader, [
     'cache' => false,
     'debug' => true,
 ]);
@@ -16,19 +18,13 @@ $twig->addExtension(new \Twig\Extension\DebugExtension());
 // Initialize Auth
 $auth = new Auth();
 
-// Extract the route from the request URI (supports /login, /signup, /dashboard, /get-started)
-$requestUri = strtok($_SERVER['REQUEST_URI'], '?');
-$page = trim($requestUri, '/');
+// --- ✅ FIXED ROUTING LOGIC ---
+$requestUri = strtok($_SERVER['REQUEST_URI'], '?'); // Strip query string
+$requestUri = trim($requestUri, '/');
+$requestUri = str_replace(['public/', 'public'], '', $requestUri);
+$page = $requestUri === '' ? 'home' : $requestUri;
 
-// Handle subdirectory installs (Render sometimes uses /public/)
-$page = str_replace('public/', '', $page);
-if ($page === '') $page = 'home';
-
-
-// If your app is served from a subdirectory, you might need to strip the base path.
-// Example: if hosted at /project/, use str_replace('/project', '', $requestUri);
-
-// Handle POST requests
+// --- ✅ HANDLE POST REQUESTS ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -36,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'login':
             $email = $_POST['email'] ?? '';
             $password = $_POST['password'] ?? '';
+
             if ($auth->login($email, $password)) {
                 header('Location: /dashboard');
                 exit;
@@ -50,15 +47,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $confirmPassword = $_POST['confirm_password'] ?? '';
 
             if (strlen($password) < 6) {
-                $signupError = 'Password must be at least 6 characters long.';
+                $signupError = 'Password must be at least 6 characters long';
             } elseif ($password !== $confirmPassword) {
-                $signupError = 'Passwords do not match.';
+                $signupError = 'Passwords do not match';
             } else {
                 if ($auth->signup($email, $password)) {
                     header('Location: /dashboard');
                     exit;
                 } else {
-                    $signupError = 'Email already exists. Please use a different email.';
+                    $signupError = 'Email already exists. Please use a different one.';
                 }
             }
             break;
@@ -70,9 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Routing
+// --- ✅ ROUTE HANDLING ---
 switch ($page) {
-    case '':
     case 'home':
         echo $twig->render('home.twig', [
             'isAuthenticated' => $auth->isAuthenticated()
@@ -110,16 +106,18 @@ switch ($page) {
         ]);
         break;
 
-    case 'get-started':
-        header('Location: /signup');
+    case 'logout':
+        $auth->logout();
+        header('Location: /login');
         exit;
+        break;
 
     default:
-        http_response_code(404);
-        if (file_exists(__DIR__ . '/../src/views/404.twig')) {
-            echo $twig->render('404.twig');
-        } else {
-            echo $twig->render('home.twig');
-        }
+        // Catch-all for unknown routes
+        header("HTTP/1.0 404 Not Found");
+        echo $twig->render('home.twig', [
+            'error' => 'Page not found',
+            'isAuthenticated' => $auth->isAuthenticated()
+        ]);
         break;
 }
