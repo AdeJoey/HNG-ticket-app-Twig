@@ -2,7 +2,7 @@
   "name": "ticket-app/twig",
   "description": "Ticket Management System with Twig",
   "require": {
-    "php": "^8.0",
+    "php": "^8.1",
     "twig/twig": "^3.0"
   },
   "autoload": {
