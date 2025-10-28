@@ -130,10 +130,12 @@ class TicketManager {
 
         container.innerHTML = this.tickets.map(ticket => this.renderTicketCard(ticket)).join('');
 
-        // Attach event listeners
+        // Attach event listeners (removed optional chaining for safety)
         this.tickets.forEach(ticket => {
-            document.getElementById(`edit-${ticket.id}`)?.addEventListener('click', () => this.startEdit(ticket.id));
-            document.getElementById(`delete-${ticket.id}`)?.addEventListener('click', () => this.deleteTicket(ticket.id));
+            const editBtn = document.getElementById(`edit-${ticket.id}`);
+            const deleteBtn = document.getElementById(`delete-${ticket.id}`);
+            if (editBtn) editBtn.addEventListener('click', () => this.startEdit(ticket.id));
+            if (deleteBtn) deleteBtn.addEventListener('click', () => this.deleteTicket(ticket.id));
         });
     }
 
@@ -198,6 +200,8 @@ class TicketManager {
 }
 
 // Initialize on page load
-if (document.getElementById('ticketList')) {
-    new TicketManager();
-}
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('ticketList')) {
+        new TicketManager();
+    }
+});

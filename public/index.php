@@ -8,18 +8,17 @@ use App\Auth;
 // Initialize Twig
 $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../src/views');
 $twig = new \Twig\Environment($loader, [
-    'cache' => false, // Disable cache for development
+    'cache' => false,
     'debug' => true,
 ]);
 
-// Add debug extension
 $twig->addExtension(new \Twig\Extension\DebugExtension());
 
 // Initialize Auth
 $auth = new Auth();
 
-// Get route from URL
-$route = $_GET['route'] ?? '';
+// Simple routing - get page from query parameter
+$page = isset($_GET['page']) ? $_GET['page'] : 'home';
 
 // Handle POST requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -31,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $password = $_POST['password'] ?? '';
             
             if ($auth->login($email, $password)) {
-                header('Location: /dashboard');
+                header('Location: index.php?page=dashboard');
                 exit;
             } else {
                 $loginError = 'Invalid credentials. Try testuser@example.com / password123';
@@ -49,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $signupError = 'Passwords do not match';
             } else {
                 if ($auth->signup($email, $password)) {
-                    header('Location: /dashboard');
+                    header('Location: index.php?page=dashboard');
                     exit;
                 } else {
                     $signupError = 'Email already exists. Please use a different email.';
@@ -59,15 +58,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
         case 'logout':
             $auth->logout();
-            header('Location: /login');
+            header('Location: index.php?page=login');
             exit;
             break;
     }
 }
 
 // Route handling
-switch ($route) {
-    case '':
+switch ($page) {
     case 'home':
         echo $twig->render('home.twig', [
             'isAuthenticated' => $auth->isAuthenticated()
@@ -76,7 +74,7 @@ switch ($route) {
         
     case 'login':
         if ($auth->isAuthenticated()) {
-            header('Location: /dashboard');
+            header('Location: index.php?page=dashboard');
             exit;
         }
         echo $twig->render('login.twig', [
@@ -86,7 +84,7 @@ switch ($route) {
         
     case 'signup':
         if ($auth->isAuthenticated()) {
-            header('Location: /dashboard');
+            header('Location: index.php?page=dashboard');
             exit;
         }
         echo $twig->render('signup.twig', [
@@ -96,7 +94,7 @@ switch ($route) {
         
     case 'dashboard':
         if (!$auth->isAuthenticated()) {
-            header('Location: /login');
+            header('Location: index.php?page=login');
             exit;
         }
         echo $twig->render('dashboard.twig', [
@@ -106,6 +104,6 @@ switch ($route) {
         break;
         
     default:
-        header('Location: /');
+        header('Location: index.php?page=home');
         exit;
 }
