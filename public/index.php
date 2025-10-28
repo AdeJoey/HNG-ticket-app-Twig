@@ -19,7 +19,11 @@ $auth = new Auth();
 // Extract the route from the request URI (supports /login, /signup, /dashboard, /get-started)
 $requestUri = strtok($_SERVER['REQUEST_URI'], '?');
 $page = trim($requestUri, '/');
+
+// Handle subdirectory installs (Render sometimes uses /public/)
+$page = str_replace('public/', '', $page);
 if ($page === '') $page = 'home';
+
 
 // If your app is served from a subdirectory, you might need to strip the base path.
 // Example: if hosted at /project/, use str_replace('/project', '', $requestUri);
